@@ -164,6 +164,10 @@ export default class StepService {
                 if (stepNumber && stepNumber > 0) {
                     stepNumbers.add(stepNumber);
                 }
+            } else {
+                logger.debug('Skipping date: Program start date', { date: startUTC.toISOString() });
+                logger.debug('Skipping date: Program end date', { date: endUTC.toISOString() });
+                logger.debug('Skipping date: Current date', { date: currentUTC.toISOString() });
             }
 
             currentDate.setDate(currentDate.getDate() + 1);
