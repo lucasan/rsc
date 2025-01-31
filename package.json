@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node build.js",
+    "deploy": "npm run build && gh-pages -d dist",
     "preview": "vite preview",
     "split-steps": "node scripts/split-steps.js"
   },
@@ -13,6 +14,7 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "autoprefixer": "^10.4.17",
     "fs-extra": "^11.3.0",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "terser": "^5.37.0",
