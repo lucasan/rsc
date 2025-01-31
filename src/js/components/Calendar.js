@@ -36,13 +36,17 @@ export default class Calendar {
         this.panelContainer = document.createElement('div');
         document.body.appendChild(this.panelContainer);
         this.stepPanel = new StepPanel(this.panelContainer);
-        
+        logger.debug('Calendar constructor');
         // Check URL for step number
         const stepFromUrl = getStepFromUrl();
+        logger.debug('stepFromUrl', stepFromUrl);
         if (stepFromUrl) {
             const dateForStep = getDateForStepNumber(this.startDate, stepFromUrl);
+            logger.debug('dateForStep', dateForStep);
             this.currentDate = new Date(dateForStep.getFullYear(), dateForStep.getMonth(), 1);
+            logger.debug('this.currentDate', this.currentDate);
             this.selectedDate = dateForStep;
+            logger.debug('this.selectedDate', this.selectedDate);
         }
         
         // Initial render

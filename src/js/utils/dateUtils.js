@@ -1,3 +1,7 @@
+import Logger from '../services/Logger.js'
+
+const logger = new Logger('Date Utils')
+
 /**
  * Calculate days between two dates
  * @param {Date} startDate 
@@ -78,7 +82,20 @@ export function getDateForStepNumber(startDate, stepNumber) {
     if (stepNumber < 1 || stepNumber > 365) {
         throw new Error('Step number must be between 1 and 365');
     }
-    const result = new Date(startDate);
-    result.setDate(startDate.getDate() + (stepNumber - 1));
+    
+    // Use UTC for date calculations
+    const result = new Date(Date.UTC(
+        startDate.getUTCFullYear(),
+        startDate.getUTCMonth(),
+        startDate.getUTCDate()
+    ));
+    
+    logger.debug('Original result', result);
+    
+    // Add days in UTC
+    result.setUTCDate(result.getUTCDate() + (stepNumber - 1));
+    
+    logger.debug('New result', result);
+    
     return result;
 } 
