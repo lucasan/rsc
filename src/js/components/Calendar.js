@@ -13,10 +13,9 @@ const logger = new Logger('Calendar')
 export default class Calendar {
     constructor(container) {
         this.container = container;
-        this.currentDate = new Date();
-        this.currentDate.setFullYear(CONFIG.PROGRAM_START_DATE.getFullYear());
-        this.selectedDate = null;
         this.startDate = CONFIG.PROGRAM_START_DATE;
+        this.currentDate = new Date(this.startDate.getFullYear(), this.startDate.getMonth(), 1);
+        this.selectedDate = null;
         
         // Bind event handlers to this instance
         this.handleClick = this.handleClick.bind(this);
@@ -37,6 +36,7 @@ export default class Calendar {
         document.body.appendChild(this.panelContainer);
         this.stepPanel = new StepPanel(this.panelContainer);
         logger.debug('Calendar constructor');
+        
         // Check URL for step number
         const stepFromUrl = getStepFromUrl();
         logger.debug('stepFromUrl', stepFromUrl);
