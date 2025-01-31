@@ -7,10 +7,15 @@
     <title>365 Steps Calendar</title>
   </head>
   <body class="bg-gray-100">
+    <!-- Set the global variable -->
+    <script>
+      window.INITIAL_PROGRAM_START_DATE = '2025-01-24T00:00:00.000Z'; // Example global variable
+    </script>
+    
     <div id="app" class="calendar-container">
       <h1 class="text-3xl font-bold text-center my-8">365 Steps Calendar</h1>
       <div id="calendar" class="bg-white rounded-lg shadow p-4"></div>
     </div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/main.js" defer></script>
   </body>
 </html> 
