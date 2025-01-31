@@ -17,7 +17,7 @@ export default defineConfig({
         drop_console: true,
         pure_funcs: ['console.log', 'console.debug']
       }
-    },
-    base: '/rsc'
-  }
+    }
+  },
+  base: './'
 }) 
