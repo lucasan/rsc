@@ -1,15 +1,63 @@
-# 365 Steps Calendar
+# Steps Calendar
 
-An interactive calendar application designed to display daily steps in a year-long program. The calendar provides an intuitive interface to navigate through steps, with features like keyboard navigation, step preview, and responsive design.
+Steps Calendar is a web application designed to help users track daily steps over a year-long program. The application is built using modern web technologies and provides a user-friendly interface for navigating through daily steps.
 
 ## Features
 
-- 📅 Monthly calendar view
-- 🔍 Step preview panel
-- ⌨️ Full keyboard navigation
-- 📱 Responsive design
-- 🚀 Fast loading with data caching
-- ♿ Accessibility features
+- **Daily Step Tracking:** View and track daily steps for a 365-day program.
+- **Responsive Design:** Works seamlessly on both desktop and mobile devices.
+- **Dynamic Navigation:** Navigate through months and view specific steps using URL parameters.
+- **Customizable Start Date:** Set the initial program start date using a global variable.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js and npm installed on your machine.
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone git@github.com:lucasan/rsc.git
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+### Usage
+
+#### Running the Development Server
+
+To start the development server, run:
+
+```bash
+npm run dev
+```
+
+This will start the server and open the application in your default web browser.
+
+#### Building for Production
+
+To build the application for production, run:
+
+```bash
+npm run build
+```
+
+This will generate the production-ready files in the `dist` directory.
+
+#### Deploying to GitHub Pages
+
+To deploy the application to GitHub Pages, run:
+
+```bash
+npm run deploy
+```
 
 ## Configuration
 
