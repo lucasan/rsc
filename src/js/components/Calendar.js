@@ -162,6 +162,15 @@ export default class Calendar {
                         </svg>
                     </button>
                 </div>
+                <div class="flex justify-center mt-2">
+                    <button 
+                        class="go-to-today px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 text-sm"
+                        tabindex="0"
+                        aria-label="Go to today's step"
+                    >
+                        Go to Today's Step
+                    </button>
+                </div>
                 <div class="px-4 py-3 bg-gray-50 rounded-lg">
                     <blockquote class="text-sm italic text-gray-600 text-center">
                         <p class="mb-2">"${quote || 'The journey of a thousand miles begins with a single step.'}"</p>
@@ -350,6 +359,7 @@ export default class Calendar {
         // Re-attach event listeners for navigation buttons
         const prevButton = this.container.querySelector('.prev-month');
         const nextButton = this.container.querySelector('.next-month');
+        const todayButton = this.container.querySelector('.go-to-today');
         
         prevButton?.addEventListener('click', () => this.navigateMonth(-1));
         prevButton?.addEventListener('keydown', (e) => {
@@ -364,6 +374,14 @@ export default class Calendar {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 this.navigateMonth(1);
+            }
+        });
+
+        todayButton?.addEventListener('click', () => this.goToToday());
+        todayButton?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.goToToday();
             }
         });
 
@@ -414,6 +432,19 @@ export default class Calendar {
         const step = await this.getStepForDate(date);
         if (step) {
             this.stepPanel.open(step);
+        }
+    }
+
+    async goToToday() {
+        const today = new Date();
+        const stepNumber = getStepNumberForDate(this.startDate, today);
+        if (stepNumber) {
+            const dateForStep = getDateForStepNumber(this.startDate, stepNumber);
+            this.currentDate = new Date(dateForStep.getFullYear(), dateForStep.getMonth(), 1);
+            this.selectedDate = dateForStep;
+            await this.loadCurrentMonthSteps();
+            await this.render();
+            await this.selectDate(this.selectedDate);
         }
     }
 } 
