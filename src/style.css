@@ -27,7 +27,6 @@
 .calendar-container {
     max-width: 100%;
     margin: 0 auto;
-    min-width: 320px;
 }
 
 @media (min-width: 768px) {

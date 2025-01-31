@@ -94,7 +94,7 @@ export default class StepPanel {
         const step = this.currentStep;
         
         this.container.innerHTML = `
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity overlay-bg">
+            <div class="panel-content fixed inset-0 bg-black bg-opacity-50 transition-opacity overlay-bg">
                 <div class="fixed inset-y-0 right-0 w-full md:max-w-4xl bg-white shadow-xl transform transition-transform duration-500 overflow-y-auto">
                     <!-- Decorative top bar -->
                     <div class="hidden md:block h-1 bg-gradient-to-r from-blue-500 to-blue-600"></div>
@@ -126,7 +126,7 @@ export default class StepPanel {
                         </button>
                         
                         <!-- Content for both mobile and desktop -->
-                        <div class="panel-content space-y-8 max-w-2xl focus:outline-none"
+                        <div class=" space-y-8 max-w-2xl focus:outline-none"
                              tabindex="0"
                              role="region"
                              aria-label="Step details">
