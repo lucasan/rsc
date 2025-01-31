@@ -18,6 +18,6 @@ export default defineConfig({
         pure_funcs: ['console.log', 'console.debug']
       }
     },
-    base: './'
+    base: '/rsc'
   }
 }) 
