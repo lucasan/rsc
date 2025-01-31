@@ -39,6 +39,7 @@ lerna-debug.log*
 # Project specific
 PLAN.md
 src/data
+.vite
 
 # Cache
 .cache
