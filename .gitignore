@@ -44,3 +44,6 @@ PLAN.md
 .cache
 .temp
 .tmp
+
+# Firebase
+src/data/resilience-cal-firebase-adminsdk-fbsvc-a1c95f609e.json

@@ -13,5 +13,11 @@ export const CONFIG = {
     },
     
     // Other global settings can go here
-    TOTAL_STEPS: 365
+    TOTAL_STEPS: 365,
+    
+    // Add Firebase config
+    FIREBASE_PROJECT_ID: "resilience-cal",
+    get FIRESTORE_BASE_URL() {
+        return `https://firestore.googleapis.com/v1/projects/${this.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+    }
 }; 

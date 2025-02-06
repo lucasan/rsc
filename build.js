@@ -13,11 +13,6 @@ async function build() {
         console.log('Building application...');
         await execPromise('npx vite build');
 
-        // Copy steps data
-        console.log('Copying steps data...');
-        await copyDir('./src/data/steps', './dist/src/data/steps');
-
-
         // Copy months titles data
         console.log('Copying months titles data...');
         await copy('src/data/months_titles.json', 'dist/src/data/months_titles.json');

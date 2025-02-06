@@ -8,7 +8,7 @@ export default class StepService {
     constructor() {
         this.cache = new Map();
         this.loading = new Map();
-        this.baseUrl = './src/data/steps';
+        this.baseUrl = CONFIG.FIRESTORE_BASE_URL;
     }
 
     async getStep(stepNumber) {
@@ -51,7 +51,7 @@ export default class StepService {
 
     async fetchStep(stepNumber) {
         try {
-            const url = `${this.baseUrl}/${stepNumber}.json`;
+            const url = `${this.baseUrl}/steps/${stepNumber}`;
             logger.debug('Fetching step', { url, stepNumber });
             
             const response = await fetch(url);
@@ -66,8 +66,15 @@ export default class StepService {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            const data = await response.json();
-            logger.debug('Raw step data', { 
+            const firestoreData = await response.json();
+            logger.debug('Raw Firestore data', { 
+                stepNumber, 
+                firestoreData
+            });
+            
+            // Transform Firestore format to our expected format
+            const data = this.transformFirestoreData(firestoreData);
+            logger.debug('Transformed step data', { 
                 stepNumber, 
                 data,
                 dataType: typeof data,
@@ -172,5 +179,25 @@ export default class StepService {
         const promises = Array.from(stepNumbers).map(number => this.getStep(number));
         const steps = await Promise.all(promises);
         return steps.filter(Boolean);
+    }
+
+    // Helper to transform Firestore data format
+    transformFirestoreData(firestoreDoc) {
+        if (!firestoreDoc?.fields) return null;
+        
+        const result = {};
+        for (const [key, value] of Object.entries(firestoreDoc.fields)) {
+            // Get the first value type key (stringValue, mapValue, etc)
+            const valueType = Object.keys(value)[0];
+            
+            if (valueType === 'mapValue') {
+                // Handle nested objects (like step_of_the_day)
+                result[key] = this.transformFirestoreData(value.mapValue);
+            } else {
+                // Handle primitive values
+                result[key] = value[valueType];
+            }
+        }
+        return result;
     }
 } 

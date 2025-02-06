@@ -8,7 +8,8 @@
     "build": "node build.js",
     "deploy": "npm run build && gh-pages -d dist",
     "preview": "vite preview",
-    "split-steps": "node scripts/split-steps.js"
+    "split-steps": "node scripts/split-steps.js",
+    "import-steps": "node scripts/importSteps.js"
   },
   "devDependencies": {
     "@tailwindcss/line-clamp": "^0.4.4",
@@ -19,5 +20,8 @@
     "tailwindcss": "^3.4.1",
     "terser": "^5.37.0",
     "vite": "^5.1.0"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.2"
   }
 }
