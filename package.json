@@ -9,7 +9,8 @@
     "deploy": "npm run build && gh-pages -d dist",
     "preview": "vite preview",
     "split-steps": "node scripts/split-steps.js",
-    "import-steps": "node scripts/importSteps.js"
+    "import-steps": "node scripts/importSteps.js",
+    "upload-quotes": "node scripts/upload-quotes.js"
   },
   "devDependencies": {
     "@tailwindcss/line-clamp": "^0.4.4",

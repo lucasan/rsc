@@ -36,13 +36,6 @@ async function buildLibrary() {
 
         await pkg.writeFile('dist/index.html', indexContent);
 
-        // Ensure data directory exists
-        await ensureDir('dist/src/data');
-
-        // Copy months titles data
-        console.log('Copying months titles data...');
-        await copy('src/data/months_titles.json', 'dist/src/data/months_titles.json');
-
         console.log('Build complete! The dist folder contains:');
         const files = await readdir('dist');
         console.log(files);

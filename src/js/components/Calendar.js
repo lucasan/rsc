@@ -32,7 +32,7 @@ export default class Calendar {
         // Initialize services with config
         this.stepService = new StepService(this.config);
         this.monthSteps = new Map();
-        this.quoteService = new QuoteService();
+        this.quoteService = new QuoteService(this.config);
         
         // Initialize step panel
         this.panelContainer = document.createElement('div');
