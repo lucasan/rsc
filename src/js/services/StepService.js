@@ -1,14 +1,20 @@
 import Logger from './Logger.js';
 import { getStepNumberForDate } from '../utils/dateUtils.js';
-import { CONFIG } from '../config.js';
 
 const logger = new Logger('StepService');
 
 export default class StepService {
-    constructor() {
+    constructor(config) {
+        this.config = config;
         this.cache = new Map();
         this.loading = new Map();
-        this.baseUrl = CONFIG.FIRESTORE_BASE_URL;
+    }
+
+    get baseUrl() {
+        if (!this.config?.FIRESTORE_BASE_URL) {
+            throw new Error('Firebase configuration is missing');
+        }
+        return this.config.FIRESTORE_BASE_URL;
     }
 
     async getStep(stepNumber) {
@@ -155,19 +161,19 @@ export default class StepService {
                 currentDate.getUTCDate()
             ));
             const startUTC = new Date(Date.UTC(
-                CONFIG.PROGRAM_START_DATE.getUTCFullYear(),
-                CONFIG.PROGRAM_START_DATE.getUTCMonth(),
-                CONFIG.PROGRAM_START_DATE.getUTCDate()
+                this.config.PROGRAM_START_DATE.getUTCFullYear(),
+                this.config.PROGRAM_START_DATE.getUTCMonth(),
+                this.config.PROGRAM_START_DATE.getUTCDate()
             ));
             const endUTC = new Date(Date.UTC(
-                CONFIG.PROGRAM_END_DATE.getUTCFullYear(),
-                CONFIG.PROGRAM_END_DATE.getUTCMonth(),
-                CONFIG.PROGRAM_END_DATE.getUTCDate()
+                this.config.PROGRAM_END_DATE.getUTCFullYear(),
+                this.config.PROGRAM_END_DATE.getUTCMonth(),
+                this.config.PROGRAM_END_DATE.getUTCDate()
             ));
 
             // Compare UTC dates
             if (currentUTC >= startUTC && currentUTC <= endUTC) {
-                const stepNumber = getStepNumberForDate(CONFIG.PROGRAM_START_DATE, currentDate);
+                const stepNumber = getStepNumberForDate(this.config.PROGRAM_START_DATE, currentDate);
                 if (stepNumber && stepNumber > 0) {
                     stepNumbers.add(stepNumber);
                 }

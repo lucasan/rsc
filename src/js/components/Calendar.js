@@ -1,6 +1,5 @@
 import { getStepNumberForDate } from '../utils/dateUtils.js'
 import DayCell from './DayCell.js'
-import { CONFIG } from '../config.js'
 import StepPanel from './StepPanel.js'
 import StepService from '../services/StepService.js'
 import Logger from '../services/Logger.js'
@@ -11,9 +10,13 @@ import { getDateForStepNumber } from '../utils/dateUtils.js'
 const logger = new Logger('Calendar')
 
 export default class Calendar {
-    constructor(container) {
+    constructor(container, config) {
+        if (!config) {
+            throw new Error('Config is required for Calendar initialization');
+        }
         this.container = container;
-        this.startDate = CONFIG.PROGRAM_START_DATE;
+        this.config = config;
+        this.startDate = this.config.PROGRAM_START_DATE;
         this.currentDate = new Date(this.startDate.getFullYear(), this.startDate.getMonth(), 1);
         this.selectedDate = null;
         
@@ -26,8 +29,8 @@ export default class Calendar {
         container.setAttribute('tabindex', '0');
         container.addEventListener('keydown', this.handleKeydown);
         
-        // Initialize services
-        this.stepService = new StepService();
+        // Initialize services with config
+        this.stepService = new StepService(this.config);
         this.monthSteps = new Map();
         this.quoteService = new QuoteService();
         
@@ -120,10 +123,10 @@ export default class Calendar {
     }
 
     async createNavigation() {
-        const firstMonth = new Date(CONFIG.PROGRAM_START_DATE);
+        const firstMonth = new Date(this.config.PROGRAM_START_DATE);
         firstMonth.setDate(1);
         
-        const lastMonth = new Date(CONFIG.PROGRAM_END_DATE);
+        const lastMonth = new Date(this.config.PROGRAM_END_DATE);
         lastMonth.setDate(1);
         
         const isFirstMonth = this.currentDate.getFullYear() === firstMonth.getFullYear() 
@@ -328,10 +331,10 @@ export default class Calendar {
         const newDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + delta, 1);
         
         // Calculate first and last valid months
-        const firstMonth = new Date(CONFIG.PROGRAM_START_DATE);
+        const firstMonth = new Date(this.config.PROGRAM_START_DATE);
         firstMonth.setDate(1);
         
-        const lastMonth = new Date(CONFIG.PROGRAM_END_DATE);
+        const lastMonth = new Date(this.config.PROGRAM_END_DATE);
         lastMonth.setDate(1);
         
         // Allow navigation to the first month

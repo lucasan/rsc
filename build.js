@@ -1,17 +1,43 @@
+import { build } from 'vite';
 import pkg from 'fs-extra';
-const { readdir, copy } = pkg;
+const { readdir, copy, ensureDir } = pkg;
 import { exec } from 'child_process';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-async function build() {
+async function buildLibrary() {
     try {
         // Run Vite build
-        console.log('Building application...');
-        await execPromise('npx vite build');
+        console.log('Building library...');
+        await build();
+
+        // Copy and modify index.html for production
+        console.log('Creating production index.html...');
+        let indexContent = await pkg.readFile('index.html', 'utf8');
+        
+        // Replace the development script with production one
+        indexContent = indexContent.replace(
+            '<script type="module" src="/src/main.js"></script>',
+            `<link rel="stylesheet" href="./resilience-calendar.css">
+            <script src="./resilience-calendar.iife.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    initResilienceCalendar({
+                        container: 'calendar',
+                        projectId: 'resilience-cal',
+                        startDate: '2025-01-14T00:00:00.000Z'
+                    });
+                });
+            </script>`
+        );
+
+        await pkg.writeFile('dist/index.html', indexContent);
+
+        // Ensure data directory exists
+        await ensureDir('dist/src/data');
 
         // Copy months titles data
         console.log('Copying months titles data...');
@@ -21,8 +47,8 @@ async function build() {
         const files = await readdir('dist');
         console.log(files);
 
-    } catch (error) {
-        console.error('Build failed:', error);
+    } catch (e) {
+        console.error('Build failed:', e);
         process.exit(1);
     }
 }
@@ -55,4 +81,4 @@ function copyDir(src, dest) {
     });
 }
 
-build(); 
+buildLibrary(); 

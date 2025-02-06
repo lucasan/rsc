@@ -1,23 +1,43 @@
-export const CONFIG = {
-    // Use a global variable if defined, otherwise default to January 1st of the current year
-    PROGRAM_START_DATE: new Date(window.INITIAL_PROGRAM_START_DATE) || new (Date().getFullYear(), 0, 1),
+import StepService from './services/StepService.js';
 
-    // Use the start date variable to calculate the end date
+export class Config {
+    constructor(options = {}) {
+        this.FIREBASE_PROJECT_ID = options.projectId || '';
+        this.PROGRAM_START_DATE = new Date(options.startDate) || new Date(Date.now());
+        this.TOTAL_STEPS = 365;
+    }
+
     get PROGRAM_END_DATE() {
-        console.log('🟩 [10] Global date', window.INITIAL_PROGRAM_START_DATE);
-        console.log('🟩 [10] PROGRAM_END_DATE', this.PROGRAM_START_DATE);
         const endDate = new Date(this.PROGRAM_START_DATE);
         endDate.setUTCDate(endDate.getUTCDate() + 364); // 365 days - 1 since we count the start date
-        console.log('🟩 [10] PROGRAM_END_DATE', endDate);
         return endDate;
-    },
-    
-    // Other global settings can go here
-    TOTAL_STEPS: 365,
-    
-    // Add Firebase config
-    FIREBASE_PROJECT_ID: "resilience-cal",
+    }
+
     get FIRESTORE_BASE_URL() {
+        if (!this.FIREBASE_PROJECT_ID) {
+            throw new Error('Firebase Project ID is required');
+        }
         return `https://firestore.googleapis.com/v1/projects/${this.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
     }
-}; 
+}
+
+// Create a main library class that initializes everything
+export class ResilienceCalendar {
+    constructor(options = {}) {
+        if (!options.projectId) {
+            throw new Error('Firebase Project ID is required');
+        }
+        this.config = new Config(options);
+        this.stepService = new StepService(this.config);
+        // Add other services as needed
+    }
+
+    // Public API methods
+    async getStep(stepNumber) {
+        return this.stepService.getStep(stepNumber);
+    }
+
+    async getStepsForMonth(year, month) {
+        return this.stepService.getStepsForMonth(year, month);
+    }
+} 
