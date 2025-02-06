@@ -5,18 +5,26 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>365 Steps Calendar</title>
-    <script type="module" crossorigin src="./assets/main-B9Lk2-Yb.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/main-D8iyAlD9.css">
+    <!-- Add CSS -->
+    <link rel="stylesheet" href="./resilience-calendar.css">
   </head>
   <body class="bg-gray-100">
-    <!-- Set the global variable -->
-    <script>
-      window.INITIAL_PROGRAM_START_DATE = '2025-01-14T00:00:00.000Z'; // Example global variable
-    </script>
-
     <div id="app" class="calendar-container">
       <h1 class="text-3xl font-bold text-center my-8">365 Steps Calendar</h1>
       <div id="calendar" class="bg-white rounded-lg shadow p-4"></div>
     </div>
+
+    <!-- In development, use the module script -->
+    <link rel="stylesheet" href="./resilience-calendar.css">
+            <script src="./resilience-calendar.iife.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    initResilienceCalendar({
+                        container: 'calendar',
+                        projectId: 'resilience-cal',
+                        startDate: '2025-01-14T00:00:00.000Z'
+                    });
+                });
+            </script>
   </body>
 </html> 
