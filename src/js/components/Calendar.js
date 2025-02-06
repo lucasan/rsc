@@ -52,6 +52,15 @@ export default class Calendar {
             logger.debug('this.selectedDate', this.selectedDate);
         }
         
+        // Add loader element
+        this.loader = document.createElement('div');
+        this.loader.className = 'calendar-loader hidden';
+        this.loader.innerHTML = `
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Loading calendar...</div>
+        `;
+        this.container.appendChild(this.loader);
+        
         // Initial render
         (async () => {
             await this.render();
@@ -328,76 +337,91 @@ export default class Calendar {
     }
 
     async navigateMonth(delta) {
-        const newDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + delta, 1);
-        
-        // Calculate first and last valid months
-        const firstMonth = new Date(this.config.PROGRAM_START_DATE);
-        firstMonth.setDate(1);
-        
-        const lastMonth = new Date(this.config.PROGRAM_END_DATE);
-        lastMonth.setDate(1);
-        
-        // Allow navigation to the first month
-        if (newDate < firstMonth) {
-            this.currentDate = firstMonth;
-        } else if (newDate > lastMonth) {
-            this.currentDate = lastMonth;
-        } else {
-            this.currentDate = newDate;
+        try {
+            this.showLoader();
+            const newDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + delta, 1);
+            
+            // Calculate first and last valid months
+            const firstMonth = new Date(this.config.PROGRAM_START_DATE);
+            firstMonth.setDate(1);
+            
+            const lastMonth = new Date(this.config.PROGRAM_END_DATE);
+            lastMonth.setDate(1);
+            
+            // Allow navigation to the first month
+            if (newDate < firstMonth) {
+                this.currentDate = firstMonth;
+            } else if (newDate > lastMonth) {
+                this.currentDate = lastMonth;
+            } else {
+                this.currentDate = newDate;
+            }
+            
+            await this.loadCurrentMonthSteps();
+            await this.render();
+        } finally {
+            this.hideLoader();
         }
-        
-        await this.loadCurrentMonthSteps();
-        await this.render();
     }
 
     async render() {
-        this.container.innerHTML = `
-            <div class="calendar-container p-6 bg-white rounded-xl shadow-lg">
-                ${await this.createNavigation()}
-                ${this.createWeekHeaders()}
-                ${await this.createCalendarGrid()}
-            </div>
-        `;
-        
-        // Re-attach event listeners for navigation buttons
-        const prevButton = this.container.querySelector('.prev-month');
-        const nextButton = this.container.querySelector('.next-month');
-        const todayButton = this.container.querySelector('.go-to-today');
-        
-        prevButton?.addEventListener('click', () => this.navigateMonth(-1));
-        prevButton?.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                this.navigateMonth(-1);
-            }
-        });
-        
-        nextButton?.addEventListener('click', () => this.navigateMonth(1));
-        nextButton?.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                this.navigateMonth(1);
-            }
-        });
+        try {
+            this.showLoader();
+            await this.loadCurrentMonthSteps();
+            
+            this.container.innerHTML = `
+                <div class="calendar-container p-6 bg-white rounded-xl shadow-lg">
+                    ${await this.createNavigation()}
+                    ${this.createWeekHeaders()}
+                    ${await this.createCalendarGrid()}
+                </div>
+            `;
+            
+            // Re-add the loader after innerHTML update
+            this.container.appendChild(this.loader);
+            
+            // Re-attach event listeners for navigation buttons
+            const prevButton = this.container.querySelector('.prev-month');
+            const nextButton = this.container.querySelector('.next-month');
+            const todayButton = this.container.querySelector('.go-to-today');
+            
+            prevButton?.addEventListener('click', () => this.navigateMonth(-1));
+            prevButton?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.navigateMonth(-1);
+                }
+            });
+            
+            nextButton?.addEventListener('click', () => this.navigateMonth(1));
+            nextButton?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.navigateMonth(1);
+                }
+            });
 
-        todayButton?.addEventListener('click', () => this.goToToday());
-        todayButton?.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                this.goToToday();
-            }
-        });
+            todayButton?.addEventListener('click', () => this.goToToday());
+            todayButton?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.goToToday();
+                }
+            });
 
-        // Add focus styles and event listeners to day cells
-        this.addEventListeners();
+            // Add focus styles and event listeners to day cells
+            this.addEventListeners();
 
-        // Focus the selected date if calendar is focused
-        const selectedCell = this.container.querySelector(`[data-date="${this.selectedDate?.toISOString()}"]`);
-        if (selectedCell) {
-            selectedCell.setAttribute('tabindex', '0');
-            if (document.activeElement === this.container) {
-                selectedCell.focus();
+            // Focus the selected date if calendar is focused
+            const selectedCell = this.container.querySelector(`[data-date="${this.selectedDate?.toISOString()}"]`);
+            if (selectedCell) {
+                selectedCell.setAttribute('tabindex', '0');
+                if (document.activeElement === this.container) {
+                    selectedCell.focus();
+                }
             }
+        } finally {
+            this.hideLoader();
         }
     }
 
@@ -424,30 +448,48 @@ export default class Calendar {
     }
 
     async selectDate(date) {
-        // Ensure the selected date is within the current month
-        if (date.getMonth() !== this.currentDate.getMonth() || date.getFullYear() !== this.currentDate.getFullYear()) {
-            this.currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
-            await this.loadCurrentMonthSteps();
-            await this.render();
-        }
+        try {
+            this.showLoader();
+            // Ensure the selected date is within the current month
+            if (date.getMonth() !== this.currentDate.getMonth() || date.getFullYear() !== this.currentDate.getFullYear()) {
+                this.currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
+                await this.loadCurrentMonthSteps();
+                await this.render();
+            }
 
-        // Select the date
-        const step = await this.getStepForDate(date);
-        if (step) {
-            this.stepPanel.open(step);
+            // Select the date
+            const step = await this.getStepForDate(date);
+            if (step) {
+                this.stepPanel.open(step);
+            }
+        } finally {
+            this.hideLoader();
         }
     }
 
     async goToToday() {
-        const today = new Date();
-        const stepNumber = getStepNumberForDate(this.startDate, today);
-        if (stepNumber) {
-            const dateForStep = getDateForStepNumber(this.startDate, stepNumber);
-            this.currentDate = new Date(dateForStep.getFullYear(), dateForStep.getMonth(), 1);
-            this.selectedDate = dateForStep;
-            await this.loadCurrentMonthSteps();
-            await this.render();
-            await this.selectDate(this.selectedDate);
+        try {
+            this.showLoader();
+            const today = new Date();
+            const stepNumber = getStepNumberForDate(this.startDate, today);
+            if (stepNumber) {
+                const dateForStep = getDateForStepNumber(this.startDate, stepNumber);
+                this.currentDate = new Date(dateForStep.getFullYear(), dateForStep.getMonth(), 1);
+                this.selectedDate = dateForStep;
+                await this.loadCurrentMonthSteps();
+                await this.render();
+                await this.selectDate(this.selectedDate);
+            }
+        } finally {
+            this.hideLoader();
         }
+    }
+
+    showLoader() {
+        this.loader.classList.remove('hidden');
+    }
+
+    hideLoader() {
+        this.loader.classList.add('hidden');
     }
 } 
