@@ -5,6 +5,22 @@ export class Config {
         this.FIREBASE_PROJECT_ID = options.projectId || '';
         this.PROGRAM_START_DATE = new Date(options.startDate) || new Date(Date.now());
         this.TOTAL_STEPS = 365;
+        
+        // Default text for the original version toggle
+        this.ORIGINAL_VERSION_TEXT = options.originalVersionText || 
+            "View original text from the book";
+        
+        // Optional shorter text for mobile
+        this.ORIGINAL_VERSION_TEXT_MOBILE = options.originalVersionTextMobile || 
+            "View original version";
+            
+        // Text for returning to simplified version
+        this.SIMPLIFIED_VERSION_TEXT = options.simplifiedVersionText ||
+            "Back to simplified version";
+            
+        // Optional shorter text for mobile when returning
+        this.SIMPLIFIED_VERSION_TEXT_MOBILE = options.simplifiedVersionTextMobile ||
+            "Back";
     }
 
     get PROGRAM_END_DATE() {

@@ -1,8 +1,10 @@
 export default class StepPanel {
-    constructor(container) {
+    constructor(container, config) {
         this.container = container;
+        this.config = config;
         this.isOpen = false;
         this.currentStep = null;
+        this.isShowingOriginal = false;
         
         // Bind methods
         this.handleClose = this.handleClose.bind(this);
@@ -11,6 +13,7 @@ export default class StepPanel {
         this.handleTouchStart = this.handleTouchStart.bind(this);
         this.handleTouchMove = this.handleTouchMove.bind(this);
         this.handleTouchEnd = this.handleTouchEnd.bind(this);
+        this.handleToggleOriginal = this.handleToggleOriginal.bind(this);
         
         // Add keyboard listener
         document.addEventListener('keydown', this.handleKeydown);
@@ -85,14 +88,69 @@ export default class StepPanel {
         window.history.pushState({}, '', url);
     }
     
+    handleToggleOriginal(e) {
+        e.preventDefault();
+        this.isShowingOriginal = !this.isShowingOriginal;
+        this.render();
+    }
+
+    getStepContent() {
+        // Helper to get either current or original content
+        if (this.isShowingOriginal && this.currentStep.original) {
+            return this.currentStep.original;
+        }
+        return {
+            step_number: this.currentStep.step_number,
+            quote: this.currentStep.quote,
+            step_of_the_day: this.currentStep.step_of_the_day,
+            action_step: this.currentStep.action_step,
+            journal_entry: this.currentStep.journal_entry
+        };
+    }
+
     render() {
         if (!this.isOpen) {
             this.container.innerHTML = '';
             return;
         }
         
-        const step = this.currentStep;
+        const step = this.getStepContent();
         
+        const toggleButton = this.currentStep.original ? `
+            <button 
+                class="group flex items-center gap-2 py-2 px-3 rounded-lg transition-all duration-200
+                text-gray-600 hover:text-blue-600 hover:bg-blue-50
+                text-sm font-medium hidden md:flex mb-6"
+                aria-label="${this.isShowingOriginal ? 'View simplified version' : this.config.ORIGINAL_VERSION_TEXT}"
+            >
+                ${this.isShowingOriginal ? 
+                    `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>` : 
+                    `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>`
+                }
+                ${this.isShowingOriginal ? this.config.SIMPLIFIED_VERSION_TEXT : this.config.ORIGINAL_VERSION_TEXT}
+            </button>
+            <button 
+                class="group flex items-center gap-2 py-2 px-3 rounded-lg transition-all duration-200
+                text-gray-600 hover:text-blue-600 hover:bg-blue-50
+                text-sm font-medium md:hidden mb-4"
+                aria-label="${this.isShowingOriginal ? 'View simplified version' : this.config.ORIGINAL_VERSION_TEXT_MOBILE}"
+            >
+                ${this.isShowingOriginal ? 
+                    `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>` : 
+                    `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>`
+                }
+                ${this.isShowingOriginal ? this.config.SIMPLIFIED_VERSION_TEXT_MOBILE : this.config.ORIGINAL_VERSION_TEXT_MOBILE}
+            </button>
+        ` : '';
+
         this.container.innerHTML = `
             <div class="panel-content fixed inset-0 bg-black bg-opacity-50 transition-opacity overlay-bg">
                 <div class="fixed inset-y-0 right-0 w-full md:max-w-4xl bg-white shadow-xl transform transition-transform duration-500 overflow-y-auto">
@@ -124,6 +182,8 @@ export default class StepPanel {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
+
+                        ${toggleButton}
                         
                         <!-- Content for both mobile and desktop -->
                         <div class="space-y-8 max-w-2xl focus:outline-none"
@@ -188,11 +248,19 @@ export default class StepPanel {
             </div>
         `;
         
-        // Add event listeners to both close buttons
+        // Add event listeners
         this.container.querySelectorAll('.mobile-close, .desktop-close').forEach(button => {
             button.addEventListener('click', this.handleClose);
         });
         this.container.querySelector('.overlay-bg').addEventListener('click', this.handleOverlayClick);
+        
+        // Add toggle event listener if original content exists
+        if (this.currentStep.original) {
+            this.container.querySelectorAll('button[aria-label]').forEach(button => {
+                if (button.classList.contains('mobile-close') || button.classList.contains('desktop-close')) return;
+                button.addEventListener('click', this.handleToggleOriginal);
+            });
+        }
 
         // Animation timing
         const panel = this.container.querySelector('.transform');

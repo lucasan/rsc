@@ -37,7 +37,7 @@ export default class Calendar {
         // Initialize step panel
         this.panelContainer = document.createElement('div');
         document.body.appendChild(this.panelContainer);
-        this.stepPanel = new StepPanel(this.panelContainer);
+        this.stepPanel = new StepPanel(this.panelContainer, this.config);
         logger.debug('Calendar constructor');
         
         // Check URL for step number
